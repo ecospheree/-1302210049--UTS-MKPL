@@ -1,7 +1,7 @@
 package lib;
+import java.util.logging.Logger;
 
 public class TaxFunction {
-
 	
 	/**
 	 * Fungsi untuk menghitung jumlah pajak penghasilan pegawai yang harus dibayarkan setahun.
@@ -14,31 +14,28 @@ public class TaxFunction {
 	 * 
 	 */
 	
+	private static final Logger LOGGER = Logger.getLogger(TaxFunction.class.getName());
+    private static final int MAX_CHILDREN_FOR_TAX_BENEFIT = 3;
+    private static final int TAX_FREE_INCOME_SINGLE = 54000000;
+    private static final int TAX_FREE_INCOME_MARRIED = 54000000 + 4500000;
+    private static final int TAX_FREE_INCOME_PER_CHILD = 1500000;
+    private static final double TAX_RATE = 0.05;
+
 	
 	public static int calculateTax(int monthlySalary, int otherMonthlyIncome, int numberOfMonthWorking, int deductible, boolean isMarried, int numberOfChildren) {
-		
-		int tax = 0;
-		
-		if (numberOfMonthWorking > 12) {
-			System.err.println("More than 12 month working per year");
-		}
-		
-		if (numberOfChildren > 3) {
-			numberOfChildren = 3;
-		}
-		
-		if (isMarried) {
-			tax = (int) Math.round(0.05 * (((monthlySalary + otherMonthlyIncome) * numberOfMonthWorking) - deductible - (54000000 + 4500000 + (numberOfChildren * 1500000))));
-		}else {
-			tax = (int) Math.round(0.05 * (((monthlySalary + otherMonthlyIncome) * numberOfMonthWorking) - deductible - 54000000));
-		}
-		
-		if (tax < 0) {
-			return 0;
-		}else {
-			return tax;
-		}
-			 
-	}
-	
+        if (numberOfMonthWorking > 12) {
+            LOGGER.warning("More than 12 months worked per year.");
+        }
+
+        numberOfChildren = Math.min(numberOfChildren, MAX_CHILDREN_FOR_TAX_BENEFIT);
+
+        int taxFreeIncome = isMarried ? TAX_FREE_INCOME_MARRIED : TAX_FREE_INCOME_SINGLE;
+        taxFreeIncome += numberOfChildren * TAX_FREE_INCOME_PER_CHILD;
+
+        int taxableIncome = ((monthlySalary + otherMonthlyIncome) * numberOfMonthWorking) - deductible - taxFreeIncome;
+
+        int tax = (int) Math.round(TAX_RATE * taxableIncome);
+
+        return Math.max(tax, 0); 
+    }
 }
