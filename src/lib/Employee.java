@@ -31,8 +31,7 @@ public class Employee {
 	private String spouseName;
 	private String spouseIdNumber;
 
-	private List<String> childNames;
-	private List<String> childIdNumbers;
+	private List<Child> children;
 	
 	public void setMonthlySalary(int grade) {
         monthlySalary = calculateSalaryByGrade(grade);
@@ -90,4 +89,14 @@ public class Employee {
 		
 		return TaxFunction.calculateTax(monthlySalary, otherMonthlyIncome, monthWorkingInYear, annualDeductible, spouseIdNumber.equals(""), childIdNumbers.size());
 	}
+
+	public static class Child {
+        private String name;
+        private String idNumber;
+
+        public Child(String name, String idNumber) {
+            this.name = name;
+            this.idNumber = idNumber;
+        }
+    }
 }
